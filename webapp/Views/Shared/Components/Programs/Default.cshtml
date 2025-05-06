@@ -1,0 +1,25 @@
+﻿@model webapp.ViewComponents.ProgramsViewModel
+
+<div>
+    <button class="btn btn-primary mb-3" asp-page-handler="AddProgram">Dodaj program</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nazwa</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var program in Model.Programs)
+            {
+                <tr>
+                    <td>@program.Name</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" asp-page-handler="EditProgram" asp-route-id="@program.Id">Edytuj</button>
+                        <button class="btn btn-danger btn-sm" asp-page-handler="DeleteProgram" asp-route-id="@program.Id">Usuń</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

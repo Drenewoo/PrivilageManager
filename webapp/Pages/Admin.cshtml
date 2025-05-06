@@ -1,0 +1,64 @@
+﻿@page
+@model webapp.Pages.AdminModel
+@{
+    ViewData["Title"] = "Panel Administratora";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+<div>
+    <h1>Panel Administratora</h1>
+
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <form method="post" asp-page-handler="ShowUsers">
+                        <button class="nav-link @(Model.ActiveTab == "Users" ? "active" : "")" style="background: none; border: none;">Użytkownicy</button>
+                    </form>
+                </li>
+                <li class="nav-item">
+                    <form method="post" asp-page-handler="ShowDegrees">
+                        <button class="nav-link @(Model.ActiveTab == "Degrees" ? "active" : "")" style="background: none; border: none;">Stopnie</button>
+                    </form>
+                </li>
+                <li class="nav-item">
+                    <form method="post" asp-page-handler="ShowDepartments">
+                        <button class="nav-link @(Model.ActiveTab == "Departments" ? "active" : "")" style="background: none; border: none;">Placówki</button>
+                    </form>
+                </li>
+                <li class="nav-item">
+                    <form method="post" asp-page-handler="ShowPrograms">
+                        <button class="nav-link @(Model.ActiveTab == "Programs" ? "active" : "")" style="background: none; border: none;">Programy</button>
+                    </form>
+                </li>
+                <li class="nav-item">
+                    <form method="post" asp-page-handler="ShowPermissions">
+                        <button class="nav-link @(Model.ActiveTab == "Permissions" ? "active" : "")" style="background: none; border: none;">Uprawnienia</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div>
+        @if (Model.ActiveTab == "Users")
+        {
+            @await Component.InvokeAsync("Users", new { selectedDepartmentId = Model.SelectedDepartmentId })
+        }
+        else if (Model.ActiveTab == "Degrees")
+        {
+            @await Component.InvokeAsync("Degrees", new { selectedDepartmentId = Model.SelectedDepartmentId })
+        }
+        else if (Model.ActiveTab == "Departments")
+        {
+            @await Component.InvokeAsync("Departments")
+        }
+        else if (Model.ActiveTab == "Programs")
+        {
+            @await Component.InvokeAsync("Programs")
+        }
+        else if (Model.ActiveTab == "Permissions")
+        {
+            @await Component.InvokeAsync("Permissions")
+        }
+    </div>
+</div>

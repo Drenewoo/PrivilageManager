@@ -1,0 +1,31 @@
+﻿@page
+@model webapp.Pages.LoginModel
+@{
+    ViewData["Title"] = "Logowanie";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+<style>
+    ul>li {
+        list-style-type: none;
+    }
+</style>
+
+<div class="align-self-sm-center align-content-center">
+    <center>
+        <form method="post">
+            <div asp-validation-summary="All"></div> <!-- Wyświetlanie błędów -->
+
+            <div class="row mb-3 w-50">
+                <div class="">
+                    <input type="text" class="form-control" name="Log" id="login1" placeholder="Login" />
+                </div>
+            </div>
+            <div class="row mb-3 w-50">
+                <div class="">
+                    <input type="password" class="form-control" name="Pass" id="password1" placeholder="Hasło" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Zaloguj Się</button>
+        </form>
+    </center>
+</div>

@@ -1,0 +1,27 @@
+﻿@model webapp.ViewComponents.PermissionsViewModel
+
+<div>
+    <button class="btn btn-primary mb-3" asp-page-handler="AddPermission">Dodaj uprawnienie</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nazwa</th>
+                <th>Program</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var permission in Model.Permissions)
+            {
+                <tr>
+                    <td>@permission.Name</td>
+                    <td>@Model.Programs.FirstOrDefault(p => p.Id == permission.ProgramId)</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" asp-page-handler="EditPermission" asp-route-id="@permission.Id">Edytuj</button>
+                        <button class="btn btn-danger btn-sm" asp-page-handler="DeletePermission" asp-route-id="@permission.Id">Usuń</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,43 @@
+﻿@model webapp.ViewComponents.DegreesViewModel
+
+<div>
+    <form method="post" asp-page-handler="ShowDegrees">
+        <button class="btn btn-primary mb-3" asp-page-handler="AddDegree">Dodaj stopień</button>
+        <select class="form-select mb-3" asp-for="SelectedDepartmentId" asp-items="@(new SelectList(Model.Departments, "Id", "Name", Model.SelectedDepartmentId))" onchange="this.form.submit()">
+            <option value="">Wszystkie placówki</option>
+        </select>
+    </form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nazwa</th>
+                <th>Placówka</th>
+                <th>Zarządzający</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var degree in Model.Degrees)
+            {
+                <tr>
+                    <td>@degree.Name</td>
+                    <td>@Model.Departments.FirstOrDefault(d => d.Id == degree.DepartmentId)?.Name</td>
+                    <td>
+                        @if (degree.ManagerId != -1)
+                        {
+                            var manager = Model.Users.First(u => u.Id == degree.ManagerId);
+                            @manager.FirstName @manager.LastName
+                        }
+                        else
+                        {
+                            <span>Brak zarządzającego</span>
+                        }
+                    <td>
+                        <button class="btn btn-primary btn-sm" asp-page-handler="EditDegree" asp-route-id="@degree.Id">Edytuj</button>
+                        <button class="btn btn-danger btn-sm" asp-page-handler="DeleteDegree" asp-route-id="@degree.Id">Usuń</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
