@@ -1,8 +1,106 @@
 ﻿@page
 @model IndexModel
 @{
-	ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Strona główna";
+    HttpContext.Session.SetString("PendingMessages", "");
 }
+<style>
+    .border-with-label {
+        position: relative;
+        border: 2px solid #222222; /* Kolor obramówki */
+        border-radius: 5px; /* Zaokrąglenie */
+        padding: 20px; /* Odstęp wewnętrzny */
+    }
+
+        .border-with-label::before {
+            content: attr(data-label); /* Pobiera tekst z atrybutu data-label */
+            position: absolute;
+            top: -10px; /* Pozycja nad obramówką */
+            left: 10px; /* Pozycja od lewej */
+            background: #222222; /* Tło tekstu */
+            color: white; /* Kolor tekstu */
+            font-size: 14px; /* Rozmiar czcionki */
+            padding: 0 5px; /* Odstęp wewnętrzny */
+            border-radius: 3px; /* Zaokrąglenie */
+        }
+</style>
+@if (HttpContext.Session.GetString("IsLoggedIn") != "true")
+{
+    <h1>Aby uzyskać dostęp do strony należy się zalogować</h1>
+}
+else
+{
+    if (!Model.IsIOD && !Model.IsAdmin)
+    {
+        <div class="border-with-label d-flex gap-3 " data-label="Twoje akcje">
+            <form method="get" asp-page="/SendApplication">
+                <button class="btn btn-primary">Złóż wniosek</button>
+            </form>
+            <form method="get" asp-page="/BrowseApplications">
+                <button class="btn btn-primary">Przeglądaj wnioski</button>
+            </form>
+            <form method="get" asp-page="/ProgramManager">
+                <button class="btn btn-primary">Przeglądarka uprawnień do programów / zasobów</button>
+            </form>
+            <form method="get" asp-page="/DeviceManager">
+                <button class="btn btn-primary">Przeglądarka urządzeń</button>
+            </form>
+
+        </div>
+    }
+
+    if(Model.IsIOD)
+    {
+        <hr />
+        <div class="border-with-label d-flex gap-3" data-label="Narzędzia administracyjne">
+            <form method="get" asp-page="/IODBrowseApplications">
+                <button class="btn btn-primary">Przeglądaj wnioski</button>
+            </form>
+        </div>
+    }
+    else if (Model.IsManager || Model.IsAdmin)
+    {
+        <hr />
+        <div class="border-with-label d-flex gap-3" data-label="Narzędzia administracyjne">
+            <form method="get" asp-page="/ManagerBrowseApplications">
+                <button class="btn btn-primary">Przeglądaj wnioski pracowników</button>
+            </form>
+            @if (!Model.IsAdmin)
+            {
+                <form method="get" asp-page="/ManagerProgramManager">
+                    <button class="btn btn-primary">Przeglądaj uprawnienia pracowników</button> @* BARDZO WAŻNE - WGL NIE ZROBIONE *@
+                </form>
+                <form method="get" asp-page="/ManagerDeviceManager">
+                    <button class="btn btn-primary">Przeglądaj urządzenia pracowników</button>
+                </form>
+            }
+            @if (Model.IsAdmin)
+            {
+                <form method="get" asp-page="/AdminBrowseApplications">
+                    <button class="btn btn-primary">Przeglądaj wszystkie wnioski</button>
+                </form>
+                <form method="get" asp-page="/HistoryView">
+                    <button class="btn btn-primary">Przeglądaj historie wniosków</button>
+                </form>
+            }
+        </div>
+
+    }
+
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+<script>
+    setTimeout(() => {
+        const alert = document.querySelector('.alert');
+        if (alert) alert.remove();
+    }, 5000); // Usuwa komunikat po 5 sekundach
+</script>
 
 
 

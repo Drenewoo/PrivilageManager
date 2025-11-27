@@ -1,0 +1,69 @@
+﻿@page
+@model webapp.Pages.ManagerDeviceManagerModel
+@{
+    ViewData["Title"] = "Przeglądarka urządzeń";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Przeglądarka urządzeń</h1>
+<hr />
+<form method="post" asp-page-handler="Filter" class="mb-3">
+    <div class="form-group d-flex align-items-center gap-2">
+        <label for="SelectedUserId" class="form-label mb-0">Filtruj według użytkownika:</label>
+        <select asp-for="SelectedUserId" asp-items="@Model.UsersSelectList" class="form-control w-auto" onchange="this.form.submit()">
+            <option value="" >-- Wszyscy użytkownicy --</option>
+        </select>
+    </div>
+</form>
+@if (!Model.Devices.Any())
+{
+    <p>Nie ma nic do wyświetlenia.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Imie</th>
+            <th>Nazwisko</th>
+            <th>Typ urządzenia</th>
+            <th>Nazwa urządzenia</th>
+            <th>Numer seryjny</th>
+            <th>Status</th>
+            <th>Data aktualizacji statusu</th>
+        </tr>
+        </thead>
+        <tbody>
+            @foreach (var device in Model.Devices)
+            {
+                <tr>
+                    <td>@device.FirstName</td>
+                    <td>@device.LastName</td>
+                    <td>@device.DeviceTypeName</td>
+                    <td>@device.DeviceName</td>
+                    <td>@device.Serial</td>
+                    <td>@device.Status</td>
+                    <td>@device.StatusUpdate.ToString("yyyy-MM-dd")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="d-flex justify-content-center align-items-center gap-2 my-2">
+    @if (Model.PageNumber > 1)
+    {
+        <form method="get" class="m-0">
+            <input type="hidden" name="pageNumber" value="@(Model.PageNumber - 1)" />
+            <button type="submit" class="btn btn-outline-primary btn-sm px-2">&lt;</button>
+        </form>
+    }
+    <span class="mx-2">@Model.PageNumber</span>
+    @if (!Model.isLastPage)
+    {
+        <form method="get" class="m-0">
+            <input type="hidden" name="pageNumber" value="@(Model.PageNumber + 1)" />
+            <button type="submit" class="btn btn-outline-primary btn-sm px-2">&gt;</button>
+        </form>
+    }
+</div>

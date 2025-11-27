@@ -1,0 +1,26 @@
+﻿@model webapp.Pages.AdminModel
+
+<div>
+    <h3>Edytuj grupę uprawnień</h3>
+    <form method="post" asp-page-handler="EditProducent" asp-route-id="@Model.SelectedId">
+        <div class="mb-3">
+            <label for="Name" class="form-label">Nazwa grupy</label>
+            <input type="text" id="Name" name="Name" class="form-control" value="@Model.SelectedProducent?.Name" required />
+            <label for="department" class="form-label">Wydział</label>
+            <select name="department" class="form-select">
+                @foreach (var dep in @Model.DepartmentSelectList)
+                {
+                    if (@Model.SelectedProducent.DepartmentId == Int32.Parse(dep.Value))
+                    {
+                        <option value="@dep.Value" selected>@dep.Text</option>    
+                    }
+                    else
+                    {
+                        <option value="@dep.Value">@dep.Text</option>
+                    }
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">Zapisz</button>
+    </form>
+</div>

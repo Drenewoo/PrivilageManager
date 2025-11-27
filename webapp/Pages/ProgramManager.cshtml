@@ -1,0 +1,82 @@
+﻿@page
+@model webapp.Pages.ProgramManagerModel
+@{
+    ViewData["Title"] = "Zarządzanie";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+<h1>Przeglądarka uprawnień</h1>
+<hr />
+@if (!Model.UserPermissions.Any())
+{
+    <p>Nie posiadasz żadnych uprawnień.</p>
+}
+else
+{
+<div>
+    <!-- Pole select do filtrowania po programie -->
+    <form method="post" asp-page-handler="ShowPermissions">
+        <select class="form-select mb-3" name="SelectedProgramId" asp-items="@(new SelectList(Model.ProgramSelectList, "Value", "Text", Model.SelectedProgramId))" onchange="this.form.submit()">
+            <option value="">Wszystkie programy / zasoby</option>
+        </select>
+    </form>
+
+    <!-- Tabela z uprawnieniami -->
+    <table class="table">
+        <thead>
+            <tr> 
+                <th>Program / zasób</th>
+                <th>Uprawnienie</th>
+                <th>Data zgłoszenia</th>
+                <th>Data odpowiedzi</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var permission in Model.UserPermissions)
+            {
+                <tr>
+                    <td>@permission.ProgramName</td>
+                    <td>@permission.PermissionName</td>
+                    <td>@permission.RequestDate.ToString("yyyy-MM-dd")</td>
+                    @if (permission.ResponseDate == DateTime.UnixEpoch)
+                    {
+                        <td>Brak</td>
+                    }
+                    else
+                    {
+                        <td>@permission.ResponseDate?.ToString("yyyy-MM-dd") </td>
+                    }
+                    <td>@permission.StatusName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Sekcja paginacji -->
+    <div class="d-flex justify-content-center align-items-center gap-2 my-2">
+        @if (Model.PageNumber > 1)
+        {
+            <form method="get" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber - 1)" />
+                <input type="hidden" name="SelectedProgramId" value="@Model.SelectedProgramId" />
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&lt;</button>
+            </form>
+        }
+        <span class="mx-2">@Model.PageNumber</span>
+        @if (!Model.isLastPage)
+        {
+            <form method="get" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber + 1)" />
+                <input type="hidden" name="SelectedProgramId" value="@Model.SelectedProgramId" />
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&gt;</button>
+            </form>
+        }
+    </div>
+</div>
+<script>
+    setTimeout(() => {
+        const alert = document.querySelector('.alert');
+        if (alert) alert.remove();
+    }, 5000); // Usuwa komunikat po 5 sekundach
+</script>
+}

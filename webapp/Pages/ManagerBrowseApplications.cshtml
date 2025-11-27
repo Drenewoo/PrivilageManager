@@ -1,0 +1,213 @@
+﻿@page
+@using webapp.Models
+@model webapp.Pages.ManagerBrowseApplicationsModel
+@{
+    ViewData["Title"] = "Przeglądaj wnioski pracowników";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Przeglądaj wnioski pracowników</h1>
+<hr />
+
+<style>
+    .rotate-180 {
+        transform: rotate(180deg);
+        transition: transform 0.3s ease;
+    }
+</style>
+<form method="post" asp-page-handler="Filter" class="mb-3">
+    <div class="form-group d-flex align-items-center gap-2">
+        <label for="SelectedUserId" class="form-label mb-0">Filtruj według użytkownika:</label>
+        <select asp-for="SelectedUserId" asp-items="@Model.UsersSelectList" class="form-control w-auto" onchange="this.form.submit()">
+            <option value="" >-- Wszyscy użytkownicy --</option>
+        </select>
+    </div>
+</form>
+
+@if (!Model.Applications.Any())
+{
+    <p>Nie znaleziono wniosków dla zarządzanych użytkowników.</p>
+}
+else
+{
+    <div>
+        @foreach (var application in Model.Applications)
+        {
+            var applicant = Model.Users.FirstOrDefault(u => u.Id == application.Messages.First().UserId);
+            var degree = applicant != null ? Model.Degrees.FirstOrDefault(d => d.Id == applicant.DegreeId) : null;
+            var department = degree != null ? Model.Departments.FirstOrDefault(dep => dep.Id == degree.DepartmentId) : null;
+            var action = Model.ActionHistories.OrderBy(d => d.Date).FirstOrDefault(e => e.ApplicationId == application.ApplicationId && e.ActionId == 1);
+            var acceptedBy = Model.UsersAll.FirstOrDefault(u => u.Id == action?.UserId);
+
+            <div class="card mb-3" id="card2-@application.ApplicationId">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">
+                            Wniosek - Data: @application.Messages.Min(m => m.RequestDate).ToString("yyyy-MM-dd")
+                        </h5>
+                        <p class="mb-0">
+                            Wnioskodawca: @applicant?.FirstName @applicant?.LastName @applicant?.Email, Zatwierdzone przez: @acceptedBy?.FirstName @acceptedBy?.LastName @acceptedBy?.Email, Wydział: @department?.Name
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <form method="post" asp-page-handler="Approve">
+                            <input type="hidden" name="applicationId" value="@application.ApplicationId" />
+                            <button class="btn btn-success btn-sm" onclick="this.form.submit()">Zatwierdź</button>
+                        </form>
+                        <form method="post" asp-page-handler="Reject">
+                            <input type="hidden" name="applicationId" value="@application.ApplicationId" />
+                            <button class="btn btn-danger btn-sm" onclick="this.form.submit()">Odrzuć</button>
+                        </form>
+                        <form method="post" asp-page-handler="Edit">
+                            <input type="hidden" name="applicationId" value="@application.ApplicationId" />
+                            <button class="btn btn-warning btn-sm" onclick="this.form.submit()">Edytuj</button>
+                        </form>
+                        <button class="btn btn-sm btn-link text-decoration-none" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapse-@application.ApplicationId"
+                                aria-expanded="@application.Expand.ToString().ToLower()"
+                                aria-controls="collapse-@application.ApplicationId">
+                            <i class="bi bi-chevron-down @(application.Expand ? "rotate-180" : "")"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="collapse-@application.ApplicationId" class="collapse">
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Typ</th>
+                                <th>Nazwa</th>
+                                <th>Uprawnienie</th>
+                                <th>Data zgłoszenia</th>
+                                @if (Model.IsAdmin)
+                                {
+                                    <th>Numer Seryjny / Login</th>
+                                }
+                                <th>Akcje</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var message in application.Messages)
+                            {
+                                <tr>
+                                    <td>
+                                        @switch (Model.GetStatus(message))
+                                        {
+                                            case 1:
+                                                <span class="badge bg-secondary ms-2">Oczekujące</span> 
+                                                break;
+                                            case 2:
+                                                <span class="badge bg-primary ms-2">Zatwierdzone</span>
+                                                break;
+                                            case 3:
+                                                <span class="badge bg-warning ms-2">Zwrócone</span>
+                                                break;
+                                            case 4:
+                                                <span class="badge bg-success ms-2">Odebrane</span>
+                                                break;
+                                            case 6:
+                                                <span class="badge bg-danger ms-2">Odrzucone</span>
+                                                break;
+                                            case 7:
+                                                <span class="badge bg-success ms-2">Wykonane</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-black ms-2">Nieznane</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>@(message.DeviceId.HasValue ? "Urządzenie" : "Program / zasób")</td>
+                                    <td>@(message.DeviceId.HasValue ? Model.GetDeviceName(message.DeviceId.Value) : Model.GetProgramName(message.ProgramId.Value))</td>
+                                    <td>@(message.DeviceId.HasValue ? "Nie dotyczy" : Model.GetPermissionName(message.PermissionId ?? 0))</td>
+                                    <td>@message.RequestDate.ToString("yyyy-MM-dd")</td>
+                                    @if (Model.IsAdmin && message.DeviceId.HasValue)
+                                    {
+                                        <td>
+                                            <form method="post" asp-page-handler="SetSerial" class="mb-3">
+                                                <div class="form-group d-flex align-items-center gap-2">
+                                                    <input type="hidden" asp-for="ApplicationId" value="@application.ApplicationId"/>
+                                                    <input type="hidden" asp-for="DevId" value="@message.DeviceId"/>
+                                                    <input type="text" asp-for="Serial" name="Serial" class="form-control" value="@Model.GetSerial(message.DeviceId ?? 0)" onfocusout="this.form.submit()"></input>
+                                                </div>
+                                            </form>
+                                        </td>
+
+                                    }
+                                    @if (Model.IsAdmin && message.UPermissionsId.HasValue)
+                                    {
+                                        <td>
+                                            <form method="post" asp-page-handler="SetUsername" class="mb-3">
+                                                <div class="form-group d-flex align-items-center gap-2">
+                                                    <input type="hidden" asp-for="ApplicationId" value="@application.ApplicationId"/>
+                                                    <input type="hidden" asp-for="UPId" value="@message.UPermissionsId"/>
+                                                    <input type="text" asp-for="Username" name="Username" class="form-control" value="@Model.GetUsername(message.UPermissionsId ?? 0)" onfocusout="this.form.submit()"></input>
+                                                </div>
+                                            </form>
+                                        </td>
+                                    }
+                                    <td>                                            
+                                        <form method="post" asp-page-handler="ShowData">
+                                            <input type="hidden" name="SelectedId" value="@message.Id"/>
+                                            <button class="btn btn-primary btn-sm">Więcej informacji</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                        <hr />
+                        <p>Uwagi do wniosku: @application.messageText</p>
+                        @if (application.expirationDate != DateTime.UnixEpoch)
+                        {
+                            <p>Data wygaśnięcia: @application.expirationDate.ToString("yyyy-MM-dd")</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="d-flex justify-content-center align-items-center gap-2 my-2">
+        @if (Model.PageNumber > 1)
+        {
+            <form method="get" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber - 1)" />
+                <input type="hidden" name="SelectedUserId" value="@Model.SelectedUserId" />
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&lt;</button>
+            </form>
+        }
+        <span class="mx-2">@Model.PageNumber</span>
+        @if (!Model.isLastPage)
+        {
+            <form method="get" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber + 1)" />
+                <input type="hidden" name="SelectedUserId" value="@Model.SelectedUserId" />
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&gt;</button>
+            </form>
+        }
+    </div>
+}
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var expandId = '@TempData["ExpandId"]';
+            if (expandId) {
+                var el = document.getElementById("collapse-" + expandId);
+                if (el) {
+                    new bootstrap.Collapse(el, { toggle: true });
+                }
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            var scrollToId = '@TempData["ScrollToId"]';
+            if (scrollToId) {
+                var element = document.getElementById(scrollToId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+    </script>
+}

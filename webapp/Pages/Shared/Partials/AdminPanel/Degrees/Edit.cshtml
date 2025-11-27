@@ -1,0 +1,46 @@
+﻿@model webapp.Pages.AdminModel
+
+<h2>Edytuj stopień</h2>
+
+<form method="post" asp-page-handler="EditDegree">
+    <input type="hidden" name="id" value="@Model.SelectedId" />
+    <div class="mb-3">
+        <label for="name" class="form-label">Nazwa</label>
+        <input type="text" class="form-control" id="name" name="name" value="@Model.Degrees.FirstOrDefault(d => d.Id == Model.SelectedId)?.Name" required />
+    </div>
+    <div class="mb-3">
+        <label for="departmentId" class="form-label">Wydział</label>
+        <select class="form-select" id="departmentId" name="departmentId" required>
+            <option value="">Wybierz wydział</option>
+            @foreach (var department in Model.Departments)
+            {
+				if (Model.Degrees.FirstOrDefault(d => d.Id == Model.SelectedId)?.DepartmentId == department.Id)
+				{
+					<option value="@department.Id" selected>@department.Name</option>
+				}
+				else
+				{
+					<option value="@department.Id">@department.Name</option>
+				}
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="managerId" class="form-label">Zarządca</label>
+        <select class="form-select" id="managerId" name="managerId" required>
+            <option value="-1">Brak zarządzającego</option>
+            @foreach (var degree in Model.Degrees)
+            {
+				if (Model.Degrees.FirstOrDefault(d => d.Id == Model.SelectedId)?.ManagerId == degree.Id)
+				{
+					<option value="@degree.Id" selected>@degree.Name - @Model.Departments.First(e => degree.DepartmentId == e.Id).Name</option>
+				}
+				else
+				{
+					<option value="@degree.Id">@degree.Name - @Model.Departments.First(e => degree.DepartmentId == e.Id).Name</option>
+				}
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+</form>

@@ -15,7 +15,15 @@ namespace webapp.Data
         public DbSet<Permission> Permissions { get; set; } // Tabela uprawnień
         public DbSet<UserPermission> UserPermissions { get; set; } // Tabela uprawnień użytkowników
         public DbSet<Status> Statuses { get; set; } // Tabela statusów
-
-
+        public DbSet<Device> Devices { get; set; } // Tabela urządzeń
+        public DbSet<MessageLink> MessageLinks { get; set; } // Tabela powiązań wiadomości
+        public DbSet<DeviceType> DeviceTypes { get; set; }
+        public DbSet<Producent> Producents { get; set; }
+        public DbSet<ActionHistory> ActionHistories { get; set; }
+        public DbSet<Actions> Actions { get; set; }
+        public DbSet<ApplicationDetails> ApplicationDetails { get; set; }
+        public DbSet<Login> Logins { get; set; } // Tabela logowania
+        public DbSet<PermissionGroup> PermissionGroups { get; set; }
     }
 }
+

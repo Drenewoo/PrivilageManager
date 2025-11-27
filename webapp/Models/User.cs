@@ -9,6 +9,7 @@
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public int DegreeId { get; set; }
-        public bool IsAdmin { get; set; } = false;
+        public int IsAdmin { get; set; } = 0;
+        public DateTime? LastPasswordChange;
     }
 }

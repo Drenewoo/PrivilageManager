@@ -1,0 +1,46 @@
+﻿@model webapp.Pages.AdminModel
+
+<div>
+    <form method="post" asp-page-handler="ShowAddDeviceType">
+        <button class="btn btn-primary mb-3">Dodaj typ urządzenia</button>
+    </form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nazwa</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var deviceType in Model.DeviceTypes)
+            {
+                <tr>
+                    <td>@deviceType.Name</td>
+                    <td>
+                        <div class="d-flex">
+                            <form asp-page-handler="ShowEditDeviceType" asp-route-id="@deviceType.Id"><button class="btn btn-primary btn-sm m-sm-1">Edytuj</button></form>
+                            <form asp-page-handler="DeleteDeviceType" asp-route-id="@deviceType.Id"><button class="btn btn-danger btn-sm m-sm-1">Usuń</button></form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-center align-items-center gap-2 my-2">
+        @if (Model.PageNumber > 1)
+        {
+            <form method="post" asp-page-handler="ShowDeviceTypes" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber - 1)" />
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&lt;</button>
+            </form>
+        }
+        <span class="mx-2">@Model.PageNumber</span>
+        @if (!Model.isLastPage)
+        {
+            <form method="post" asp-page-handler="ShowDeviceTypes" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber + 1)" />
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&gt;</button>
+            </form>
+        }
+    </div>
+</div>

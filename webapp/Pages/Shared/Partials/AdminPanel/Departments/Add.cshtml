@@ -1,0 +1,11 @@
+﻿@model webapp.Pages.AdminModel
+
+<h2>Dodaj wydział</h2>
+
+<form method="post" asp-page-handler="AddDepartment">
+    <div class="mb-3">
+        <label for="name" class="form-label">Nazwa</label>
+        <input type="text" class="form-control" id="name" name="name" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Dodaj</button>
+</form>

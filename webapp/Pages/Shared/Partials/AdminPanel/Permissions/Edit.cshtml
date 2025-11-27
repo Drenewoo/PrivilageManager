@@ -1,0 +1,29 @@
+﻿@model webapp.Pages.AdminModel
+
+<h2>Edytuj uprawnienie</h2>
+
+<form method="post" asp-page-handler="EditPermission">
+    <input type="hidden" name="id" value="@Model.SelectedId" />
+    <div class="mb-3">
+        <label for="name" class="form-label">Nazwa</label>
+        <input type="text" class="form-control" id="name" name="name" value="@Model.Permissions.FirstOrDefault(p => p.Id == Model.SelectedId)?.Name" required />
+    </div>
+    <div class="mb-3">
+        <label for="programId" class="form-label">Program / zasób</label>
+        <select class="form-select" id="programId" name="programId" required>
+            <option value="">Wybierz program / zasób</option>
+            @foreach (var program in Model.Programs)
+            {
+                if (Model.Permissions.FirstOrDefault(d => d.Id == Model.SelectedId)?.ProgramId == program.Id)
+                {
+                    <option value="@program.Id" selected>@program.Name</option>
+                }
+                else
+                {
+                    <option value="@program.Id">@program.Name</option>
+                }
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+</form>

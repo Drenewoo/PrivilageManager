@@ -1,0 +1,19 @@
+﻿@model webapp.Pages.AdminModel
+
+<div>
+    <h3>Dodaj grupę uprawnień</h3>
+    <form method="post" asp-page-handler="AddProducent">
+        <div class="mb-3">
+            <label for="Name" class="form-label">Nazwa grupy</label>
+            <input type="text" id="Name" name="Name" class="form-control" required />
+            <label for="department" class="form-label">Wydział</label>
+            <select name="department" class="form-select">
+                @foreach (var dep in @Model.DepartmentSelectList)
+                {
+                    <option value="@dep.Value">@dep.Text</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">Dodaj</button>
+    </form>
+</div>

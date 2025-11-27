@@ -1,0 +1,72 @@
+﻿@model webapp.Pages.AdminModel
+
+<div>
+    <form method="post" asp-page-handler="ShowAddUP">
+        <button class="btn btn-primary mb-3">Dodaj uprawnienie</button>
+    </form>
+    <form method="post" asp-page-handler="ShowUP" class="mb-3">
+        <div class="form-group d-flex align-items-center gap-2">
+            <label for="SelectedUserId" class="form-label mb-0">Filtruj według użytkownika:</label>
+            <select asp-for="SelectedUserId" asp-items="@Model.UsersSelectList" class="form-control w-auto" onchange="this.form.submit()">
+                <option value="" >-- Wszyscy użytkownicy --</option>
+            </select>
+        </div>
+    </form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Imie</th>
+                <th>Nazwisko</th>
+                <th>Email</th>
+                <th>Program / zasób</th>
+                <th>Uprawnienie</th>
+                <th>Status</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var userPermission in Model.UserPermissions)
+            {
+                <tr>
+                    <td>@Model.Users.FirstOrDefault(u => u.Id == userPermission.UserId)?.FirstName</td>
+                    <td>@Model.Users.FirstOrDefault(u => u.Id == userPermission.UserId)?.LastName</td>
+                    <td>@Model.Users.FirstOrDefault(u => u.Id == userPermission.UserId)?.Email</td>
+                    
+                    <td>@Model.Programs.FirstOrDefault(p => p.Id == Model.Permissions.FirstOrDefault(p => p.Id == userPermission.PermissionId).ProgramId)?.Name</td>
+                    <td>@Model.Permissions.FirstOrDefault(p => p.Id == userPermission.PermissionId)?.Name</td>
+                    <td>@Model.Statuses.FirstOrDefault(p => p.Id == userPermission.StatusId)?.Name</td>
+                    <td>
+                        <div class="d-flex">
+                            <form asp-page-handler="DeletePermissionUser" asp-route-id="@userPermission.Id"><button class="btn btn-danger btn-sm m-sm-1" onclick="this.form.submit()">Usuń</button></form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-center align-items-center gap-2 my-2">
+        @if (Model.PageNumber > 1)
+        {
+            <form method="post" asp-page-handler="ShowUP" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber - 1)" />
+                @if (Model.SelectedUserId != null)
+                {
+                    <input type="hidden" name="SelectedUserId" value="@Model.SelectedUserId" />
+                }
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&lt;</button>
+            </form>
+        }
+        <span class="mx-2">@Model.PageNumber</span>
+        @if (!Model.isLastPage)
+        {
+            <form method="post" asp-page-handler="ShowUP" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber + 1)" />
+                @if (Model.SelectedUserId != null)
+                {
+                    <input type="hidden" name="SelectedUserId" value="@Model.SelectedUserId" />
+                }
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&gt;</button>
+            </form>
+        }
+    </div>
+</div>

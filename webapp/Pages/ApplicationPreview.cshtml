@@ -1,0 +1,15 @@
+@page
+@model webapp.Pages.ApplicationPreview
+
+@{
+    ViewData["Title"] = "Podgląd PDF";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<iframe src="/ApplicationPdf?handler=Pdf"
+        width="100%"
+        height="900px"
+        style="border:1px solid #ccc;">
+</iframe>

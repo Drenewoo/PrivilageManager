@@ -1,0 +1,31 @@
+﻿@model webapp.Pages.AdminModel
+
+<h2>Dodaj stopień</h2>
+
+<form method="post" asp-page-handler="AddDegree">
+    <div class="mb-3">
+        <label for="name" class="form-label">Nazwa</label>
+        <input type="text" class="form-control" id="name" name="name" required />
+    </div>
+    <div class="mb-3">
+        <label for="departmentId" class="form-label">Wydział</label>
+        <select class="form-select" id="departmentId" name="departmentId" required>
+            <option value="">Wybierz wydział</option>
+            @foreach (var department in Model.Departments)
+            {
+                <option value="@department.Id">@department.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="managerId" class="form-label">Zarządca</label>
+        <select class="form-select" id="managerId" name="managerId" required>
+            <option value="-1">Brak zarządzającego</option>
+            @foreach (var degree in Model.Degrees)
+            {
+                <option value="@degree.Id">@degree.Name - @Model.Departments.First(e => degree.DepartmentId == e.Id).Name</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Dodaj</button>
+</form>

@@ -25,7 +25,7 @@ namespace webapp.Pages
         public IActionResult OnPost()
         {
             var user = _context.Users.FirstOrDefault(u => u.Username == Log);
-            if (user != null && Pass != string.Empty)
+            if (user != null && !( Pass == string.Empty ||  Pass == null))
             {
                 var passwordHasher = new PasswordHasher<User>();
                 var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, Pass);
@@ -33,13 +33,13 @@ namespace webapp.Pages
                 if (result == PasswordVerificationResult.Success)
                 {
                     HttpContext.Session.SetString("IsLoggedIn", "true");
-                    HttpContext.Session.SetString("IsAdmin", user.IsAdmin.ToString());
+                    HttpContext.Session.SetInt32("IsAdmin", user.IsAdmin);
                     HttpContext.Session.SetInt32("UserId", user.Id);
                     return RedirectToPage("/Index");
                 }
             }
 
-            ModelState.AddModelError(string.Empty, "Nieprawid³owy login lub has³o.");
+            ModelState.AddModelError(string.Empty, "NieprawidÅ‚owy login lub hasÅ‚o.");
             return Page();
         }
         public IActionResult OnGetLogout()
@@ -48,7 +48,7 @@ namespace webapp.Pages
             {
                 return RedirectToPage("/Login");
             }
-            // Usuñ stan zalogowania z sesji
+            // Usuï¿½ stan zalogowania z sesji
             HttpContext.Session.Remove("IsLoggedIn");
             HttpContext.Session.Remove("IsAdmin");
             HttpContext.Session.Remove("UserId");

@@ -1,0 +1,21 @@
+﻿@model webapp.Pages.AdminModel
+
+<h2>Dodaj program / zasób</h2>
+
+<form method="post" asp-page-handler="AddProgram">
+    <div class="mb-3">
+        <label for="name" class="form-label">Nazwa</label>
+        <input type="text" class="form-control" id="name" name="name" required />
+    </div>
+    @*<div class="mb-3">
+        <label for="producerId" class="form-label">wydział</label>
+        <select class="form-select" id="producerId" name="producerId" required>
+            <option value="">-- Wybierz wydział --</option>
+            @foreach (var producent in Model.Producents)
+            {
+                <option value="@producent.Id">@producent.Name</option>
+            }
+        </select>
+    </div>*@
+    <button type="submit" class="btn btn-primary">Dodaj</button>
+</form>

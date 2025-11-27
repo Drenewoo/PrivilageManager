@@ -10,31 +10,84 @@
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container">
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <form method="post" asp-page-handler="ShowUsers">
-                        <button class="nav-link @(Model.ActiveTab == "Users" ? "active" : "")" style="background: none; border: none;">Użytkownicy</button>
-                    </form>
+                <!-- Sekcja Użytkownicy -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="usersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Zarządzanie użytkownikami
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="usersDropdown">
+                        <li>
+                            <form method="post" asp-page-handler="ShowUsers">
+                                <button class="dropdown-item @(Model.ActiveTab == "Users" ? "active" : "")">Użytkownicy</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form method="post" asp-page-handler="ShowDegrees">
+                                <button class="dropdown-item @(Model.ActiveTab == "Degrees" ? "active" : "")">Stopnie</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form method="post" asp-page-handler="ShowDepartments">
+                                <button class="dropdown-item @(Model.ActiveTab == "Departments" ? "active" : "")">Wydziały</button>
+                            </form>
+                        </li>
+                    </ul>
                 </li>
-                <li class="nav-item">
-                    <form method="post" asp-page-handler="ShowDegrees">
-                        <button class="nav-link @(Model.ActiveTab == "Degrees" ? "active" : "")" style="background: none; border: none;">Stopnie</button>
-                    </form>
+
+                <!-- Sekcja Programy i Producenci -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="programsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Zarządzanie programami / zasobami
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="programsDropdown">
+                        <li>
+                            <form method="post" asp-page-handler="ShowPrograms">
+                                <button class="dropdown-item @(Model.ActiveTab == "Programs" ? "active" : "")">Programy / zasoby</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form method="post" asp-page-handler="ShowPermissions">
+                                <button class="dropdown-item @(Model.ActiveTab == "Permissions" ? "active" : "")">Uprawnienia</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form method="post" asp-page-handler="ShowProducents">
+                                <button class="dropdown-item @(Model.ActiveTab == "Producents" ? "active" : "")">Grupy uprawnień</button>
+                            </form>
+                        </li>
+                    </ul>
                 </li>
-                <li class="nav-item">
-                    <form method="post" asp-page-handler="ShowDepartments">
-                        <button class="nav-link @(Model.ActiveTab == "Departments" ? "active" : "")" style="background: none; border: none;">Placówki</button>
-                    </form>
+                <!-- Sekcja Urządzenia -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="devicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Zarządzanie urządzeniami
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="devicesDropdown">
+                        <li>
+                            <form method="post" asp-page-handler="ShowDeviceTypes">
+                                <button class="dropdown-item @(Model.ActiveTab == "DeviceTypes" ? "active" : "")">Typy urządzeń</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form method="post" asp-page-handler="ShowDevices">
+                                <button class="dropdown-item @(Model.ActiveTab == "Devices" ? "active" : "")">Urządzenia</button>
+                            </form>
+                        </li>
+                    </ul>
                 </li>
-                <li class="nav-item">
-                    <form method="post" asp-page-handler="ShowPrograms">
-                        <button class="nav-link @(Model.ActiveTab == "Programs" ? "active" : "")" style="background: none; border: none;">Programy</button>
-                    </form>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="devicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Uprawnienia użytkowników
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="devicesDropdown">
+                        <li>
+                            <form method="post" asp-page-handler="ShowUP">
+                                <button class="dropdown-item @(Model.ActiveTab == "UserPermissions" ? "active" : "")">Przeglądarka uprawnień</button>
+                            </form>
+                        </li>
+                    </ul>
                 </li>
-                <li class="nav-item">
-                    <form method="post" asp-page-handler="ShowPermissions">
-                        <button class="nav-link @(Model.ActiveTab == "Permissions" ? "active" : "")" style="background: none; border: none;">Uprawnienia</button>
-                    </form>
-                </li>
+                
             </ul>
         </div>
     </nav>
@@ -42,23 +95,129 @@
     <div>
         @if (Model.ActiveTab == "Users")
         {
-            @await Component.InvokeAsync("Users", new { selectedDepartmentId = Model.SelectedDepartmentId })
+            @await Html.PartialAsync("Partials/AdminPanel/Users/Default", Model)
+        }
+        else if (Model.ActiveTab == "AddUser")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Users/Add", Model)
+        }
+        else if (Model.ActiveTab == "EditUser")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Users/Edit", Model)
         }
         else if (Model.ActiveTab == "Degrees")
         {
-            @await Component.InvokeAsync("Degrees", new { selectedDepartmentId = Model.SelectedDepartmentId })
+            @await Html.PartialAsync("Partials/AdminPanel/Degrees/Default", Model)
+        }
+        else if (Model.ActiveTab == "AddDegree")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Degrees/Add", Model)
+        }
+        else if (Model.ActiveTab == "EditDegree")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Degrees/Edit", Model)
         }
         else if (Model.ActiveTab == "Departments")
         {
-            @await Component.InvokeAsync("Departments")
+            @await Html.PartialAsync("Partials/AdminPanel/Departments/Default", Model)
+        }
+        else if (Model.ActiveTab == "AddDepartment")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Departments/Add", Model)
+        }
+        else if (Model.ActiveTab == "EditDepartment")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Departments/Edit", Model)
         }
         else if (Model.ActiveTab == "Programs")
         {
-            @await Component.InvokeAsync("Programs")
+            @await Html.PartialAsync("Partials/AdminPanel/Programs/Default", Model)
+        }
+        else if (Model.ActiveTab == "AddProgram")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Programs/Add", Model)
+        }
+        else if (Model.ActiveTab == "EditProgram")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Programs/Edit", Model)
         }
         else if (Model.ActiveTab == "Permissions")
         {
-            @await Component.InvokeAsync("Permissions")
+            @await Html.PartialAsync("Partials/AdminPanel/Permissions/Default", Model)
+        }
+        else if (Model.ActiveTab == "AddPermission")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Permissions/Add", Model)
+        }
+        else if (Model.ActiveTab == "EditPermission")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Permissions/Edit", Model)
+        }
+        else if (Model.ActiveTab == "Producents")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Producents/Default", Model)
+        }
+        else if (Model.ActiveTab == "AddProducent")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Producents/Add", Model)
+        }
+        else if (Model.ActiveTab == "EditProducent")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Producents/Edit", Model)
+        }
+        else if (Model.ActiveTab == "DeviceTypes")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/DeviceTypes/Default", Model)
+        }
+        else if (Model.ActiveTab == "AddDeviceType")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/DeviceTypes/Add", Model)
+        }
+        else if (Model.ActiveTab == "EditDeviceType")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/DeviceTypes/Edit", Model)
+        }
+        else if (Model.ActiveTab == "Devices")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Devices/Default", Model)
+        }
+        else if (Model.ActiveTab == "AddDevice")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Devices/Add", Model)
+        }
+        else if (Model.ActiveTab == "EditDevice")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/Devices/Edit", Model)
+        }
+        else if (Model.ActiveTab == "UserPermissions")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/PermissionsAll/Default", Model)
+        }
+        else if (Model.ActiveTab == "UserPermissionsAdd")
+        {
+            @await Html.PartialAsync("Partials/AdminPanel/PermissionsAll/Add", Model)
         }
     </div>
 </div>
+@section Scripts {<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var scrollToId = '@TempData["ScrollToId"]';
+            if (scrollToId) {
+                var element = document.getElementById(scrollToId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+        function scroll () {
+            var scrollToId = '@TempData["ScrollToId"]';
+            if (scrollToId) {
+                var element = document.getElementById(scrollToId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        }
+    </script>
+
+}

@@ -1,0 +1,12 @@
+﻿@model webapp.Pages.AdminModel
+
+<div>
+    <h3>Edytuj typ urządzenia</h3>
+    <form method="post" asp-page-handler="EditDeviceType" asp-route-id="@Model.SelectedId">
+        <div class="mb-3">
+            <label for="Name" class="form-label">Nazwa typu urządzenia</label>
+            <input type="text" id="Name" name="Name" class="form-control" value="@Model.SelectedDeviceType?.Name" required />
+        </div>
+        <button type="submit" class="btn btn-success">Zapisz</button>
+    </form>
+</div>

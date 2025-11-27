@@ -1,0 +1,12 @@
+﻿@model webapp.Pages.AdminModel
+
+<h2>Edytuj program / zasób</h2>
+
+<form method="post" asp-page-handler="EditProgram">
+    <input type="hidden" name="id" value="@Model.SelectedId" />
+    <div class="mb-3">
+        <label for="name" class="form-label">Nazwa</label>
+        <input type="text" class="form-control" id="name" name="name" value="@Model.Programs.FirstOrDefault(d => d.Id == Model.SelectedId)?.Name" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+</form>

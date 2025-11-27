@@ -1,0 +1,87 @@
+﻿@model webapp.Pages.AdminModel
+
+<div onload="scroll()">
+    <form method="post" asp-page-handler="ShowAddProducent">
+        <button class="btn btn-primary mb-3">Dodaj grupę uprawnień</button>
+    </form>
+    @foreach (var permissionGroup in @Model.PermissionGroups)
+    {
+        <div class="card mb-3" id="card-@permissionGroup.Id">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    Nazwa grupy: @permissionGroup.Name
+                </h5>
+                <h6>
+                    Wydział: @Model.Departments.FirstOrDefault(d => d.Id == @permissionGroup.DepartmentId).Name
+                </h6>
+                
+                <div class="d-flex gap-2">
+                    <div class="d-flex">
+                        <form asp-page-handler="ShowEditProducent" asp-route-id="@permissionGroup.Id"><button class="btn btn-primary btn-sm m-sm-1" onclick="this.form.submit()">Edytuj</button></form>
+                        <form asp-page-handler="DeleteProducent" asp-route-id="@permissionGroup.Id"><button class="btn btn-danger btn-sm m-sm-1" onclick="this.form.submit()">Usuń</button></form>
+                    </div>
+                    @* <button class="btn btn-link text-decoration-none btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@permissionGroup.Id" aria-expanded="false" aria-controls="collapse-@permissionGroup.Id"> *@
+                    @*     <i class="bi bi-chevron-down"></i> *@
+                    @* </button> *@
+                </div>
+            </div>
+            <div id="collapse-@permissionGroup.Id">
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Uprawnienie</th>
+                            <th>Program</th>
+                            <th>Akcje</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var id in permissionGroup.PermissionIds)
+                        {
+                            <tr>
+                                <td> @Model.GetPermissionName(id) </td>
+                                <td> @Model.GetPermissionProgram(id) </td>
+                                <td> <form asp-page-handler="DeletePermissionFromGroup" method="post"><input type="hidden" asp-for="PGid" name="group" value="@permissionGroup.Id"><input type="hidden" asp-for="PGPid" name="perm" value="@id"/><button class="btn btn-danger btn-sm m-sm-1" onclick="this.form.submit()">Usuń</button></form></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                    <form asp-page-handler="AddPermission2group">
+                        <div class="mb-3">
+                            <label for="Type" class="form-label">Dodaj uprawnienie</label>
+                            <input type="hidden" name="group" value="@permissionGroup.Id">
+                            <select name="select" class="form-select mb-3">
+                                @foreach (var perm in @Model.GetPermissionsSelectList(permissionGroup))
+                                {
+                                    <option value="@perm.Value">@perm.Text</option>
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-primary mb-3">Dodaj</button>
+                            
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="d-flex justify-content-center align-items-center gap-2 my-2">
+        @if (Model.PageNumber > 1)
+        {
+            <form method="post" asp-page-handler="ShowProducents" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber - 1)" />
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&lt;</button>
+            </form>
+        }
+        <span class="mx-2">@Model.PageNumber</span>
+        @if (!Model.isLastPage)
+        {
+            <form method="post" asp-page-handler="ShowProducents" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber + 1)" />
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&gt;</button>
+            </form>
+        }
+    </div>
+</div>
+@section Scripts {
+    
+}

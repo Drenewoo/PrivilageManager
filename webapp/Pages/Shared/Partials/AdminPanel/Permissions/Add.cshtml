@@ -1,0 +1,21 @@
+﻿@model webapp.Pages.AdminModel
+
+<h2>Dodaj uprawnienie</h2>
+
+<form method="post" asp-page-handler="AddPermission">
+    <div class="mb-3">
+        <label for="name" class="form-label">Nazwa</label>
+        <input type="text" class="form-control" id="name" name="name" required />
+    </div>
+    <div class="mb-3">
+        <label for="programId" class="form-label">Program</label>
+        <select class="form-select" id="programId" name="programId" required>
+            <option value="">Wybierz program / zasób</option>
+            @foreach (var program in Model.Programs)
+            {
+                <option value="@program.Id">@program.Name</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Dodaj</button>
+</form>

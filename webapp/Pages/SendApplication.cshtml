@@ -1,0 +1,242 @@
+﻿@page
+@model webapp.Pages.SendApplicationModel
+@{
+    ViewData["Title"] = "Złóż wniosek";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Złóż wniosek o uprawnienia</h1>
+<hr />
+
+<!-- Lista zgłoszeń -->
+@if (Model.PendingMessages.Any())
+{
+    <h3>Lista zgłoszeń</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Typ</th>
+                <th>Nazwa</th>
+                <th>Uprawnienie</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var message in Model.PendingMessages)
+            {
+                <tr>
+                    <td><span>@(message.DeviceId.HasValue ? "Urządzenie " : "Program ") @(message.DeviceId.HasValue ? "- " + Model.GetDeviceType(message.DeviceId.Value) : "") </span></td>
+                    <td>@(message.DeviceId.HasValue ? Model.GetDeviceName(message.DeviceId.Value) : Model.GetProgramName(message.ProgramId.Value))</td>
+                    <td>@(message.DeviceId.HasValue ? "Nie dotyczy" : Model.GetPermissionName(message.PermissionId ?? 0))</td>
+                    <td>
+                        <form method="post" asp-page-handler="RemoveMessage">
+                            <input type="hidden" name="MessageIndex" value="@Model.PendingMessages.IndexOf(message)" />
+                            <input type="hidden" name="MessageText" id="hiddenMessageText2" value="@Model.MessageText" />
+                            <input type="hidden" name="ExpireDate" id="hiddenExpireDate2" value="@(Model.ExpireDate?.ToString("yyyy-MM-dd") ?? "")" />
+                            <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Brak zgłoszeń w liście.</p>
+}
+
+<hr />
+
+
+<!-- Formularz dodawania zgłoszenia -->
+<h3>Dodaj zgłoszenie</h3>
+<form method="post" asp-page-handler="AddMessage" id="addMessageForm">
+    <div class="mb-3">
+        <label for="Type" class="form-label">Typ zgłoszenia</label>
+        <select id="Type" name="Type" class="form-select" onchange="toggleFields()">
+            <option value="Program">Program / zasób</option>
+            <option value="Device">Urządzenie</option>
+        </select>
+    </div>
+
+    @* <div id="ProducerFields" class="mb-3" style="display: none"> *@
+    @*     <label for="ProducerId" class="form-label">Wybierz producenta</label> *@
+    @*     <select id="ProducerId" name="ProducerId" class="form-select" onchange="loadPrograms(this.value)"> *@
+    @*         <option value="">-- Wybierz producenta --</option> *@
+    @*         @foreach (var producer in Model.ProducerSelectList) *@
+    @*         { *@
+    @*             <option value="@producer.Value">@producer.Text</option> *@
+    @*         } *@
+    @*     </select> *@
+    @* </div> *@
+    @* *@
+    @* <div id="ProgramFields" class="mb-3" > *@
+    @*     <label for="ProgramId" class="form-label">Program / zasób</label> *@
+    @*     <select id="ProgramId" name="ProgramId" class="form-select" onchange="loadPermissions(this.value)"> *@
+    @*         <option value="">-- Wybierz program / zasób --</option> *@
+    @*         @foreach (var program in Model.ProgramSelectList) *@
+    @*         { *@
+    @*             <option value="@program.Value">@program.Text</option> *@
+    @*         } *@
+    @*     </select> *@
+    @* </div > *@
+
+    <div id="PermissionFields" class="mb-3" style="display: block;">
+        <label for="PermissionId" class="form-label">Wybierz uprawnienia</label>
+        <select id="PermissionId" name="PermissionId" class="form-select">
+            <option value="">Wybierz uprawnienia</option>
+            @foreach (var permission in Model.PermissionSelectList)
+            {
+                <option value="@permission.Value">@permission.Text</option>
+            }
+        </select>
+    </div>
+
+    <div id="DeviceTypeFields" class="mb-3" style="display: none;">
+        <label for="DeviceTypeId" class="form-label">Wybierz typ urządzenia</label>
+        <select id="DeviceTypeId" name="DeviceTypeId" class="form-select" onchange="loadDevices(this.value)">
+            <option value="">Wybierz typ urządzenia</option>
+            @foreach (var deviceType in Model.DeviceTypeSelectList)
+            {
+                <option value="@deviceType.Value">@deviceType.Text</option>
+            }
+        </select>
+    </div>
+
+    <div id="DeviceFields" class="mb-3" style="display: none;">
+        <label for="DeviceId" class="form-label">Wybierz urządzenie</label>
+        <select id="DeviceId" name="DeviceId" class="form-select">
+            <option value="">Wybierz urządzenie</option>
+        </select>
+    </div>
+    <!-- Ukryte pola na MessageText i ExpireDate, uzupełniane JS-em -->
+    <input type="hidden" name="MessageText" id="hiddenMessageText1" value="@Model.MessageText"/>
+    <input type="hidden" name="ExpireDate" id="hiddenExpireDate1" value="@(Model.ExpireDate?.ToString("yyyy-MM-dd") ?? "")"/>
+    <button type="submit" class="btn btn-primary">Dodaj do listy</button>
+</form>
+
+<hr />
+<!-- Widoczne pola MessageText i ExpireDate -->
+<label for="MessageTextVisible" class="form-label">Uwagi do wniosku (opcjonalne, max 50 znaków)</label>
+<textarea id="MessageTextVisible" class="form-control" maxlength="50" onchange="sync()">@Model.MessageText</textarea>
+<div class="mb-3 mt-2">
+    <label for="ExpireDateVisible" class="form-label">Data wygaśnięcia wniosku</label>
+    <input type="date" id="ExpireDateVisible" class="form-control" value="@(Model.ExpireDate?.ToString("yyyy-MM-dd") ?? "")" onchange="sync()"/>
+</div>
+
+
+<hr />
+<!-- Przycisk wysyłania zgłoszenia -->
+<form method="post" asp-page-handler="SubmitApplication">
+    <button type="submit" class="btn btn-success">Wyślij zgłoszenie</button>
+    <input type="hidden" name="MessageText" id="hiddenMessageText" value="@Model.MessageText" />
+    <input type="hidden" name="ExpireDate" id="hiddenExpireDate" value="@(Model.ExpireDate?.ToString("yyyy-MM-dd") ?? "")" />
+</form>
+
+@section Scripts {
+    <script>
+        function sync() {
+            document.getElementById('hiddenMessageText').value = document.getElementById('MessageTextVisible').value;
+            document.getElementById('hiddenExpireDate').value = document.getElementById('ExpireDateVisible').value;
+            document.getElementById('hiddenMessageText1').value = document.getElementById('MessageTextVisible').value;
+            document.getElementById('hiddenExpireDate1').value = document.getElementById('ExpireDateVisible').value;
+            document.getElementById('hiddenMessageText2').value = document.getElementById('MessageTextVisible').value;
+            document.getElementById('hiddenExpireDate2').value = document.getElementById('ExpireDateVisible').value;
+        }
+        // Przed wysłaniem formularza AddMessage przepisz wartości z widocznych pól do hidden inputów
+        // document.getElementById('addMessageForm').addEventListener('submit', function(e) {
+        //     document.getElementById('hiddenMessageText').value = document.getElementById('MessageTextVisible').value;
+        //     document.getElementById('hiddenExpireDate').value = document.getElementById('ExpireDateVisible').value;
+        // });
+    </script>
+    <script>
+        function loadDevices(deviceTypeId) {
+            const deviceSelect = document.getElementById("DeviceId");
+            deviceSelect.innerHTML = '<option value="">Wybierz urządzenie</option>';
+
+            if (deviceTypeId) {
+                fetch(`/SendApplication?handler=Devices&deviceTypeId=${deviceTypeId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            data.devices.forEach(device => {
+                                const option = document.createElement("option");
+                                option.value = device.id;
+                                option.textContent = device.name;
+                                deviceSelect.appendChild(option);
+                            });
+                        } else {
+                            alert(data.message || "Wystąpił błąd podczas pobierania urządzeń.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Błąd:", error);
+                        alert("Nie udało się pobrać urządzeń.");
+                    });
+            }
+        }
+    </script>
+    <script>
+        function toggleFields() {
+            const type = document.getElementById("Type").value;
+            //document.getElementById("ProgramFields").style.display = type === "Program" ? "block" : "none";
+			//document.getElementById("ProducerFields").style.display = type === "Program" ? "none" : "none";
+            document.getElementById("PermissionFields").style.display = type === "Program" ? "block" : "none";
+            document.getElementById("DeviceFields").style.display = type === "Device" ? "block" : "none";
+            document.getElementById("DeviceTypeFields").style.display = type === "Device" ? "block" : "none"
+        }
+
+        function loadPermissions(programId) {
+            const permissionSelect = document.getElementById("PermissionId");
+            permissionSelect.innerHTML = '<option value="">-- Wybierz uprawnienie --</option>';
+
+            if (programId) {
+                fetch(`/SendApplication?handler=Permissions&programId=${programId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            data.permissions.forEach(permission => {
+                                const option = document.createElement("option");
+                                option.value = permission.id;
+                                option.textContent = permission.name;
+                                permissionSelect.appendChild(option);
+                            });
+                        } else {
+                            alert(data.message || "Wystąpił błąd podczas pobierania uprawnień.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Błąd:", error);
+                        alert("Nie udało się pobrać uprawnień.");
+                    });
+            }
+        }
+        function loadPrograms(programId) {
+            const permissionSelect = document.getElementById("ProgramId");
+            permissionSelect.innerHTML = '<option value="">-- Wybierz program / zasób --</option>';
+            const permissionsSelect = document.getElementById("PermissionId");
+            permissionsSelect.innerHTML = '<option value="">-- Wybierz uprawnienie --</option>';
+            if (programId) {
+                fetch(`/SendApplication?handler=Programs&programId=${programId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            data.permissions.forEach(permission => {
+                                const option = document.createElement("option");
+                                option.value = permission.id;
+                                option.textContent = permission.name;
+                                permissionSelect.appendChild(option);
+                            });
+                        } else {
+                            alert(data.message || "Wystąpił błąd podczas pobierania programów / zasobów.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Błąd:", error);
+                        alert("Nie udało się pobrać programów / zasobów.");
+                    });
+            }
+        }
+    </script>
+}

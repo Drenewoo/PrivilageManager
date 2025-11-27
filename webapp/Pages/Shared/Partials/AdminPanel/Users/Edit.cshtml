@@ -1,0 +1,111 @@
+﻿@model webapp.Pages.AdminModel
+
+<h2>Edytuj użytkownika</h2>
+
+<form method="post" asp-page-handler="EditUser">
+    <input type="hidden" name="id" value="@Model.SelectedId" />
+    <div class="mb-3">
+        <label for="username" class="form-label">Nazwa użytkownika</label>
+        <input type="text" class="form-control" id="username" name="username" value="@Model.Users.FirstOrDefault(u => u.Id == Model.SelectedId)?.Username" required />
+    </div>
+    <div class="mb-3">
+        <label for="firstName" class="form-label">Imię</label>
+        <input type="text" class="form-control" id="firstName" name="firstName" value="@Model.Users.FirstOrDefault(u => u.Id == Model.SelectedId)?.FirstName" />
+    </div>
+    <div class="mb-3">
+        <label for="lastName" class="form-label">Nazwisko</label>
+        <input type="text" class="form-control" id="lastName" name="lastName" value="@Model.Users.FirstOrDefault(u => u.Id == Model.SelectedId)?.LastName" />
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email" value="@Model.Users.FirstOrDefault(u => u.Id == Model.SelectedId)?.Email" />
+    </div>
+    <div class="mb-3">
+        <label for="departmentId" class="form-label">Wydział</label>
+        <select class="form-select" id="departmentId" name="departmentId" onchange="filterDegrees()" required>
+            <option value="">Wybierz wydział</option>
+            @foreach (var department in Model.Departments)
+            {
+                @if (Model.Degrees.FirstOrDefault(d => d.Id == Model.Users.FirstOrDefault(u => u.Id == Model.SelectedId)?.DegreeId)?.DepartmentId == department.Id) {
+                    <option value="@department.Id" selected>@department.Name</option>
+                }
+                else
+                {
+                    <option value="@department.Id">@department.Name</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="degreeId" class="form-label">Stopień</label>
+        <select class="form-select" id="degreeId" name="degreeId" required>
+            <option value="">Wybierz stopień</option>
+            @foreach (var degree in Model.Degrees)
+            {
+                @if (Model.Users.FirstOrDefault(u => u.Id == Model.SelectedId)?.DegreeId == degree.Id)
+                {
+                    <option value="@degree.Id" data-department-id="@degree.DepartmentId" selected>@degree.Name</option>
+                }
+                else
+                {
+                    <option value="@degree.Id" data-department-id="@degree.DepartmentId">@degree.Name</option>                    
+                }
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Hasło</label>
+        <input type="password" class="form-control" id="password" name="password"/>
+    </div>
+    <div class="mb-3">
+        <label for="isAdmin" class="form-label">Administrator</label>
+        <select class="form-select" id="isAdmin" name="isAdmin" required>
+            @switch (Model.Users.FirstOrDefault(u => u.Id == Model.SelectedId)?.IsAdmin)
+            {
+                case 0:
+                    <option value="0" selected>Zwykły użytkownik</option>
+                    <option value="1">Administrator</option>
+                    <option value="2">Inspektor ochrony danych</option>
+                    break;
+                case 1:
+                    <option value="0">Zwykły użytkownik</option>
+                    <option value="1" selected>Administrator</option>
+                    <option value="2">Inspektor ochrony danych</option>
+                    break;
+                case 2:
+                    <option value="0">Zwykły użytkownik</option>
+                    <option value="1">Administrator</option>
+                    <option value="2" selected>Inspektor ochrony danych</option>
+                    break;
+                default:
+                    <option value="0">Zwykły użytkownik</option>
+                    <option value="1">Administrator</option>
+                    <option value="2">Inspektor ochrony danych</option>
+                    break;
+            }
+
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+</form>
+
+<script>
+    function filterDegrees() {
+        var departmentId = document.getElementById("departmentId").value;
+        var degreeSelect = document.getElementById("degreeId");
+        var options = degreeSelect.options;
+
+        for (var i = 0; i < options.length; i++) {
+            var option = options[i];
+            var optionDepartmentId = option.getAttribute("data-department-id");
+
+            if (!departmentId || optionDepartmentId === departmentId) {
+                option.style.display = "block";
+            } else {
+                option.style.display = "none";
+            }
+        }
+
+        degreeSelect.value = ""; // Reset the selected value
+    }
+</script>

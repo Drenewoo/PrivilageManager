@@ -1,0 +1,61 @@
+﻿@model webapp.Pages.AdminModel
+
+<div>
+    <form method="post" asp-page-handler="ShowDevices">
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="showAllDevices" name="ShowAll" value="true" @(Model.ShowAllDevices ? "checked" : "") onchange="this.form.submit()" />
+            <label class="form-check-label" for="showAllDevices">Pokazuj tylko rzeczywiste</label>
+        </div>
+    </form>
+
+    <form method="post" asp-page-handler="ShowAddDevice">
+        <button class="btn btn-primary mb-3">Dodaj urządzenie</button>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nazwa</th>
+                <th>Typ</th>
+                <th>Numer seryjny</th>
+                <th>Status</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var device in Model.Devices)
+            {
+                <tr>
+                    <td>@device.Name</td>
+                    <td>@Model.DeviceTypes.FirstOrDefault(d => d.Id == device.DeviceTypeId)?.Name</td>
+                    <td>@device.Serial</td>
+                    <td>@Model.Statuses.FirstOrDefault(s => s.Id == device.StatusId)?.Name</td>
+                    <td>
+                        <div class="d-flex">
+                            <form asp-page-handler="ShowEditDevice" asp-route-id="@device.Id"><button class="btn btn-primary btn-sm m-sm-1">Edytuj</button></form>
+                            <form asp-page-handler="DeleteDevice" asp-route-id="@device.Id"><button class="btn btn-danger btn-sm m-sm-1">Usuń</button></form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center align-items-center gap-2 my-2">
+        @if (Model.PageNumber > 1)
+        {
+            <form method="post" asp-page-handler="ShowDevices" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber - 1)" />
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&lt;</button>
+            </form>
+        }
+        <span class="mx-2">@Model.PageNumber</span>
+        @if (!Model.isLastPage)
+        {
+            <form method="post" asp-page-handler="ShowDevices" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber + 1)" />
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&gt;</button>
+            </form>
+        }
+    </div>
+</div>

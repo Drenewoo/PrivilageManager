@@ -1,0 +1,61 @@
+﻿@model webapp.Pages.AdminModel
+
+<div>
+    <form method="post" asp-page-handler="ShowAddPermission">
+        <button class="btn btn-primary mb-3">Dodaj uprawnienie</button>
+    </form>
+    <form method="post" asp-page-handler="ShowPermissions">
+        <select class="form-select mb-3" name="SelectedDepartmentId" asp-items="@(new SelectList(Model.Programs, "Id", "Name", Model.SelectedDepartmentId))" onchange="this.form.submit()">
+            <option value="">Wszystkie programy / zasoby</option>
+        </select>
+    </form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nazwa</th>
+                <th>Program / zasób</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var permission in Model.Permissions)
+            {
+                <tr>
+                    <td>@permission.Name</td>
+                    <td>@Model.Programs.FirstOrDefault(p => p.Id == permission.ProgramId)?.Name</td>
+                    <td>
+                        <div class="d-flex">
+                            <form asp-page-handler="ShowEditPermission" asp-route-id="@permission.Id"><button class="btn btn-primary btn-sm m-sm-1" onclick="this.form.submit()">Edytuj</button></form>
+                            <form asp-page-handler="DeletePermission" asp-route-id="@permission.Id"><button class="btn btn-danger btn-sm m-sm-1" onclick="this.form.submit()">Usuń</button></form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-center align-items-center gap-2 my-2">
+        @if (Model.PageNumber > 1)
+        {
+            <form method="post" asp-page-handler="ShowPermissions" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber - 1)" />
+                @if (Model.SelectedDepartmentId != null)
+                {
+                    <input type="hidden" name="SelectedDepartmentId" value="@Model.SelectedDepartmentId" />
+                }
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&lt;</button>
+            </form>
+        }
+        <span class="mx-2">@Model.PageNumber</span>
+        @if (!Model.isLastPage)
+        {
+            <form method="post" asp-page-handler="ShowPermissions" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber + 1)" />
+                @if (Model.SelectedDepartmentId != null)
+                {
+                    <input type="hidden" name="SelectedDepartmentId" value="@Model.SelectedDepartmentId" />
+                }
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&gt;</button>
+            </form>
+        }
+    </div>
+</div>

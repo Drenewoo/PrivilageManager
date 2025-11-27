@@ -1,0 +1,90 @@
+﻿@page
+@model webapp.Pages.ManagerProgramManagerModel
+@{
+    ViewData["Title"] = "Zarządzanie";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+<h1>Przeglądarka uprawnień</h1>
+<hr />
+<form method="post" asp-page-handler="Filter" class="mb-3">
+    <div class="form-group d-flex align-items-center gap-2">
+        <label for="SelectedUserId" class="form-label mb-0">Filtruj według użytkownika:</label>
+        <select asp-for="SelectedUserId" asp-items="@Model.UsersSelectList" class="form-control w-auto" onchange="this.form.submit()">
+            <option value="" >Wszyscy użytkownicy</option>
+        </select>
+    </div>
+</form>
+@if (!Model.UserPermissions.Any())
+{
+    <p>Nie ma nic do wyświetlenia.</p>
+}
+else
+{
+
+<div>
+    <!-- Pole select do filtrowania po programie -->
+
+    <!-- Tabela z uprawnieniami -->
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Imie</th>
+            <th>Nazwisko</th>
+            <th>Wydział</th>
+            <th>Program / zasób</th>
+            <th>Uprawnienie</th>
+            <th>Data zgłoszenia</th>
+            <th>Data odpowiedzi</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+            @foreach (var permission in Model.UserPermissions)
+            {
+                <tr>
+                    <td>@permission.FirstName</td>
+                    <td>@permission.LastName</td>
+                    <td>@permission.ProducerName</td>
+                    <td>@permission.ProgramName</td>
+                    <td>@permission.PermissionName</td>
+                    <td>@permission.RequestDate.ToString("yyyy-MM-dd")</td>
+                    @if (permission.ResponseDate == DateTime.UnixEpoch)
+                    {
+                        <td>Brak</td>
+                    }
+                    else
+                    {
+                        <td>@permission.ResponseDate?.ToString("yyyy-MM-dd") </td>
+                    }
+                    <td>@permission.StatusName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="d-flex justify-content-center align-items-center gap-2 my-2">
+    @if (Model.PageNumber > 1)
+    {
+        <form method="get" class="m-0">
+            <input type="hidden" name="pageNumber" value="@(Model.PageNumber - 1)" />
+            <input type="hidden" name="SelectedUserId" value="@Model.SelectedUserId" />
+            <button type="submit" class="btn btn-outline-primary btn-sm px-2">&lt;</button>
+        </form>
+    }
+    <span class="mx-2">@Model.PageNumber</span>
+    @if (!Model.isLastPage)
+    {
+        <form method="get" class="m-0">
+            <input type="hidden" name="pageNumber" value="@(Model.PageNumber + 1)" />
+            <input type="hidden" name="SelectedUserId" value="@Model.SelectedUserId" />
+            <button type="submit" class="btn btn-outline-primary btn-sm px-2">&gt;</button>
+        </form>
+    }
+</div>
+<script>
+    setTimeout(() => {
+        const alert = document.querySelector('.alert');
+        if (alert) alert.remove();
+    }, 5000); // Usuwa komunikat po 5 sekundach
+</script>
+}

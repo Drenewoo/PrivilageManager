@@ -1,0 +1,66 @@
+﻿@model webapp.Pages.AdminModel
+
+<div>
+
+
+    <form method="post" asp-page-handler="ShowAddProgram">
+        <button class="btn btn-primary mb-3">Dodaj program / zasób</button>
+    </form>
+    @* <form method="post" asp-page-handler="ShowPrograms"> *@
+    @*     <select class="form-select mb-3" name="SelectedProducerId" asp-items="@(new SelectList(Model.Producents, "Id", "Name", Model.SelectedProducerId))" onchange="this.form.submit()"> *@
+    @*         <option value="">Wszystkie programy / zasoby</option> *@
+    @*     </select> *@
+    @* </form> *@
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nazwa</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var program in Model.Programs)
+            {
+                <tr>
+                    <td>@program.Name</td>
+                    <td>
+                        <div class="d-flex">
+                            <form asp-page-handler="ShowEditProgram" asp-route-id="@program.Id">
+                                <button class="btn btn-primary btn-sm m-sm-1">Edytuj</button>
+                            </form>
+                            <form asp-page-handler="DeleteProgram" asp-route-id="@program.Id">
+                                <button class="btn btn-danger btn-sm m-sm-1">Usuń</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-center align-items-center gap-2 my-2">
+        @if (Model.PageNumber > 1)
+        {
+            <form method="post" asp-page-handler="ShowPrograms" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber - 1)" />
+                @if (Model.SelectedProducerId != null)
+                {
+                    <input type="hidden" name="SelectedProducerId" value="@Model.SelectedProducerId" />
+                }
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&lt;</button>
+            </form>
+        }
+        <span class="mx-2">@Model.PageNumber</span>
+        @if (!Model.isLastPage)
+        {
+            <form method="post" asp-page-handler="ShowPrograms" class="m-0">
+                <input type="hidden" name="pageNumber" value="@(Model.PageNumber + 1)" />
+                @if (Model.SelectedProducerId != null)
+                {
+                    <input type="hidden" name="SelectedProducerId" value="@Model.SelectedProducerId" />
+                }
+                <button type="submit" class="btn btn-outline-primary btn-sm px-2">&gt;</button>
+            </form>
+        }
+    </div>
+</div>

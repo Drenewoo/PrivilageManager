@@ -1,0 +1,32 @@
+﻿@model webapp.Pages.AdminModel
+
+<div>
+    <h3>Edytuj urządzenie</h3>
+    <form method="post" asp-page-handler="EditDevice" asp-route-id="@Model.SelectedId">
+        <div class="mb-3">
+            <label for="Name" class="form-label">Nazwa urządzenia</label>
+            <input type="text" id="Name" name="Name" class="form-control" value="@Model.SelectedDevice?.Name" required />
+        </div>
+        <div class="mb-3">
+            <label for="DeviceTypeId" class="form-label">Typ urządzenia</label>
+            <select id="DeviceTypeId" name="DeviceTypeId" class="form-select" required>
+                @foreach (var deviceType in Model.DeviceTypes)
+                {
+                    if (deviceType.Id == Model.SelectedDevice?.DeviceTypeId)
+                    {
+                        <option value="@deviceType.Id" selected>@deviceType.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@deviceType.Id">@deviceType.Name</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="Serial" class="form-label">Numer seryjny (opcjonalny)</label>
+            <input type="text" id="Serial" name="Serial" class="form-control" value="@Model.SelectedDevice?.Serial" />
+        </div>
+        <button type="submit" class="btn btn-success">Zapisz</button>
+    </form>
+</div>

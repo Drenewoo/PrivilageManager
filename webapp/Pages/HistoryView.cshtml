@@ -1,0 +1,163 @@
+@page
+@using Microsoft.Identity.Client
+@model webapp.Pages.HistoryView
+@{
+    ViewData["Title"] = "Historia wniosku";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Historia wniosku</h1>
+<hr />
+
+@*<div class="form-check mb-3">
+    <input class="form-check-input" type="checkbox" id="showAllRequests" name="showAllRequests" onchange="this.form.submit()" @(Model.ShowAllRequests ? "checked" : "") />
+    <label class="form-check-label" for="showAllRequests">
+        Pokaż wnioski wszystkich użytkowników
+    </label>
+</div>*@
+
+@*@if (Model.ShowAllRequests)
+{
+    <div class="mb-3">
+        <label for="userFilter" class="form-label">Filtruj według użytkownika:</label>
+        $1$<select id="userFilter" name="SelectedUserId" class="form-select" onchange="this.form.submit()">
+            <option value="">Wszyscy użytkownicy</option>
+            @foreach (var user in Model.VisibleUsers)
+            {
+                <option value="@user.Id" selected="@(Model.SelectedUserId == user.Id ? "selected" : null)">
+                    @user.FirstName @user.LastName (@user.Email)
+                </option>
+            }
+        </select>#1#
+    </div>
+}*@
+
+@if (!Model.ActionHistoryModels.Any())
+{
+    <p>Nie udało się pobrać historii.</p>
+}
+else
+{
+    foreach (ActionHistoryModel action in Model.ActionHistoryModels)
+    {
+        var applicant = Model.Users.FirstOrDefault(u => u.Id == action.ApplicantId);
+        var editor = Model.Users.FirstOrDefault(u => u.Id == action.EditorId);
+        <div class="card mb-3">
+            <div class="card-header d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        Wniosek - Data złożenia: @action.ActionDate.ToString("yyyy-MM-dd HH:mm:ss")
+                    </h5>
+                    <span class="text-muted">Ostatnia aktualizacja: @action.LastUpdatedDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                    @*<div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-link text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@action.Id" aria-expanded="false" aria-controls="collapse-@action.Id">
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                    </div>*@
+                </div>
+                <div class="mt-2">
+                    @if (action.IsRejected == true)
+                    {
+                        <span class="badge bg-danger ms-2">Odrzucone</span>
+                    }
+                    else if (action.IsApproved)
+                    {
+                        <span class="badge bg-primary ms-2">Zatwierdzone</span>
+                    }
+                    else if (action.IsDone)
+                    {
+                        <span class="badge bg-success ms-2">Wykonane</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary ms-2">Oczekujące</span>
+                    }
+                    @if (action.IsChecked ?? false == true)
+                    {
+                        <span class="badge bg-info ms-2">Przejrzane przez IOD</span>
+                    }
+                </div>
+            </div>
+            <div>
+                <div class="card-body">
+                    <h6>Wiadomości:</h6>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>Typ</th>
+                            <th>Nazwa</th>
+                            <th>Uprawnienie</th>
+                            <th>Data zgłoszenia</th>
+                            <th>Akcje</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var message in action.Messages)
+                        {
+                            <tr>
+                                <td>
+                                    @switch (Model.GetStatus(message))
+                                    {
+                                        case 1:
+                                            <span class="badge bg-secondary ms-2">Oczekujące</span>
+                                            break;
+                                        case 2:
+                                            <span class="badge bg-primary ms-2">Zatwierdzone</span>
+                                            break;
+                                        case 3:
+                                            <span class="badge bg-warning ms-2">Zwrócone</span>
+                                            break;
+                                        case 4:
+                                            <span class="badge bg-success ms-2">Odebrane</span>
+                                            break;
+                                        case 6:
+                                            <span class="badge bg-danger ms-2">Odrzucone</span>
+                                            break;
+                                        case 7:
+                                            <span class="badge bg-success ms-2">Wykonane</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-black ms-2">Nieznane</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>@(message.DeviceId.HasValue ? "Urządzenie" : "Program")</td>
+                                <td>@(message.DeviceId.HasValue ? Model.GetDeviceName(message.DeviceId.Value) : Model.GetProgramName(message.ProgramId.Value))</td>
+                                <td>@(message.DeviceId.HasValue ? "Nie dotyczy" : Model.GetPermissionName(message.PermissionId ?? 0))</td>
+                                <td>@message.RequestDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    <a class="btn btn-sm btn-primary" href="@(message.DeviceId.HasValue ? (User.IsInRole("Manager") || User.IsInRole("Admin") ? Url.Page("/ManagerDeviceManager", new { id = message.DeviceId }) : Url.Page("/DeviceManager", new { id = message.DeviceId })) : (User.IsInRole("Manager") || User.IsInRole("Admin") ? Url.Page("/ManagerProgramManager", new { id = message.ProgramId }) : Url.Page("/ProgramManager", new { id = message.ProgramId })))">
+                                        Więcej informacji
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                    <h6>Historia akcji:</h6>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Akcja</th>
+                            <th>Użytkownik</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var history in action.ActionHistories)
+                        {
+                            var user = Model.Users.FirstOrDefault(u => u.Id == history.UserId);
+                            <tr>
+                                <td>@history.Date.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td>@Model.GetActionName(history.ActionId)</td>
+                                <td>@user?.FirstName @user?.LastName (@user?.Email)</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}

@@ -9,16 +9,56 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\Shared\Partials\AdminPanel\Nowy folder\**" />
+    <Content Remove="Pages\Shared\Partials\AdminPanel\Nowy folder\**" />
+    <EmbeddedResource Remove="Pages\Shared\Partials\AdminPanel\Nowy folder\**" />
+    <None Remove="Pages\Shared\Partials\AdminPanel\Nowy folder\**" />
+    <Content Update="appsettings.json.template">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DinkToPdf" Version="1.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="Razor.Templating.Core" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="Views\Shared\Components\AdminPanel\Degrees\" />
+    <Folder Include="Views\Shared\Components\AdminPanel\Departments\" />
+    <Folder Include="Views\Shared\Components\AdminPanel\Permissions\" />
+    <Folder Include="Views\Shared\Components\AdminPanel\Programs\" />
+    <Folder Include="Views\Shared\Components\AdminPanel\Users\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="Pages\Shared\Partials\AdminPanel\PermissionsAll\Add.cshtml" />
+    <AdditionalFiles Include="Pages\Shared\Partials\AdminPanel\PermissionsAll\Default.cshtml" />
+    <AdditionalFiles Include="Pages\Shared\Partials\AdminPanel\PermissionsAll\Edit.cshtml" />
   </ItemGroup>
 
 </Project>

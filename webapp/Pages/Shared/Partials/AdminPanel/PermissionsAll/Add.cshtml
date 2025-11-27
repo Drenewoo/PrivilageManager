@@ -1,0 +1,152 @@
+﻿@model webapp.Pages.AdminModel
+
+<h2>Dodaj uprawnienie dla użytkownika</h2>
+
+<form method="post" asp-page-handler="AddUP">
+    <div class="mb-3">
+        <label for="DepartmentId" class="form-label">Wydział</label>
+        <select class="form-select" id="DepartmentId" name="DepartmentId" onchange="loadUsers(this.value)">
+            <option value="">Wybierz wydział</option>
+            @foreach (var program in Model.Departments)
+            {
+                <option value="@program.Id">@program.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="UserId" class="form-label">Użytkownik</label>
+        <select class="form-select" id="UserId" name="UserId" required onchange="setUser(this.value)">
+            <option value="-2">-- Wybierz użytkownika --</option>
+        </select>
+    </div>
+    <div class="mb-3" style="display: none">
+        <label for="ProducerId" class="form-label">Wybierz wydział</label>
+        <select id="ProducerId" name="ProducerId" class="form-select" onchange="loadPrograms(this.value)" >
+            <option value="">-- Wybierz wydział --</option>
+            @foreach (var producer in Model.Producents)
+            {
+                <option value="@producer.Id">@producer.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="ProgramId" class="form-label">Program</label>
+        <select class="form-select" id="ProgramId" name="ProgramId" onchange="loadPermissions(this.value)">
+            <option value="">-- Wybierz program / zasób --</option>
+            @foreach (var program in Model.Programs)
+            {
+                <option value="@program.Id">@program.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="PermissionId" class="form-label">Uprawnienie</label>
+        <select class="form-select" id="PermissionId" name="PermissionId">
+            <option value="">-- Wybierz uprawnienie --</option>
+            @foreach (var program in Model.Permissions)
+            {
+                <option value="@program.Id">@program.Name</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Dodaj</button>
+</form>
+<script>
+    function loadPermissions(programId) {
+        const permissionSelect = document.getElementById("PermissionId");
+        permissionSelect.innerHTML = '<option value="-2">-- Wybierz uprawnienie --</option>';
+
+        if (programId) {
+            fetch(`/Admin?handler=PermissionsPA&programId=${programId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        data.permissions.forEach(permission => {
+                            const option = document.createElement("option");
+                            option.value = permission.id;
+                            option.textContent = permission.name;
+                            permissionSelect.appendChild(option);
+                        });
+                    } else {
+                        alert(data.message || "Wystąpił błąd podczas pobierania uprawnień.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Błąd:", error);
+                    alert("Nie udało się pobrać uprawnień.");
+                });
+        }
+    }
+    function setUser(Id)
+    {
+        const permissionSelect = document.getElementById("ProgramId");
+        permissionSelect.innerHTML = '<option value="">-- Wybierz program / zasób --</option>';
+        const permissionsSelect = document.getElementById("PermissionId");
+        permissionsSelect.innerHTML = '<option value="-2">-- Wybierz uprawnienie --</option>';
+        if(Id) {
+            fetch(`/Admin?handler=SetUser&Id=${Id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                    } else {
+                        alert(data.message || "Wystąpił błąd");
+                    }
+                })
+                .catch(error => {
+                        console.error("Błąd:", error);
+                        alert("Wystąpił błąd");
+                    });
+        }
+    }
+    function loadPrograms(programId) {
+        const permissionSelect = document.getElementById("ProgramId");
+        permissionSelect.innerHTML = '<option value="">-- Wybierz program / zasób --</option>';
+        const permissionsSelect = document.getElementById("PermissionId");
+        permissionsSelect.innerHTML = '<option value="-2">-- Wybierz uprawnienie --</option>';
+        if (programId) {
+            fetch(`/SendApplication?handler=Programs&programId=${programId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        data.permissions.forEach(permission => {
+                            const option = document.createElement("option");
+                            option.value = permission.id;
+                            option.textContent = permission.name;
+                            permissionSelect.appendChild(option);
+                        });
+                    } else {
+                        alert(data.message || "Wystąpił błąd podczas pobierania programów / zasobów.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Błąd:", error);
+                    alert("Nie udało się pobrać programów / zasobów.");
+                });
+        }
+    }
+    function loadUsers(programId) {
+        const UserSelect = document.getElementById("UserId");
+        UserSelect.innerHTML = '<option value="-2">-- Wybierz użytkownika --</option>';
+        if (programId) {
+            fetch(`/Admin?handler=Users&userId=${programId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        data.users.forEach(user => {
+                            const option = document.createElement("option");
+                            option.value = user.id;
+                            option.textContent = user.text;
+                            UserSelect.appendChild(option);
+                        });
+                    } else {
+                        alert(data.message || "Wystąpił błąd podczas pobierania programów / zasobów.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Błąd:", error);
+                    alert("Nie udało się pobrać programów / zasobów.");
+                });
+        }
+    }
+</script>
+

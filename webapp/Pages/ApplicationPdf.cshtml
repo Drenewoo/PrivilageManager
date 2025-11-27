@@ -1,0 +1,81 @@
+@page
+@model webapp.Pages.ApplicationPdf
+@{
+    Layout = null; // brak layoutu, bo nie renderujemy HTML
+}
+@*<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 10px; }
+        th, td { border: 1px solid #000; padding: 5px; }
+        .header { background: #ddd; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <table>
+        <tr>
+            <td>Numer wniosku<br/>@Model.data.ApplicationId</td>
+            <td>Data złożenia<br/>@Model.data.ApplicationDate.ToString("dd.MM.yyyy")</td>
+        </tr>
+    </table>
+
+    <div class="header">Wnioskodawca:</div>
+    <table>
+        <tr><td>Imię i nazwisko<br/>@Model.data.WhoFName @Model.data.WhoLName</td><td>Stanowisko<br/>@Model.data.Degree</td></tr>
+        <tr><td></td><td>Wydział<br/>@Model.data.Department</td></tr>
+    </table>
+
+    <div class="header">Wnioskuje dla:</div>
+    <table>
+        <tr><td>Imię i nazwisko<br/>@Model.data.ForFName @Model.data.ForLName</td><td>Stanowisko<br/>@Model.data.DegreeFor</td></tr>
+        <tr><td></td><td>Wydział<br/>@Model.data.DepartmentFor</td></tr>
+    </table>
+
+    <div class="header">Wiadomość dodatkowa do wniosku:</div>
+    <p>@Model.data.MessageText</p>
+
+    <div class="header">Data wygaśnięcia wniosku:</div>
+    <p>@Model.data.ExpireDate.ToString("dd.MM.yyyy")</p>
+
+    <div class="header">Uprawnienia:</div>
+    <table>
+        <tr><th>Program</th><th>Uprawnienie</th><th>Nazwa użytkownika</th></tr>
+        @foreach (var p in Model.data.Permissions)
+        {
+            <tr>
+                <td>@p.Program</td>
+                <td>@p.Permission</td>
+                <td>@p.Login</td>
+            </tr>
+        }
+    </table>
+
+    <div class="header">Urządzenia:</div>
+    <table>
+        <tr><th>Nazwa urządzenia</th><th>Numer seryjny</th></tr>
+        @foreach (var d in Model.data.Devices)
+        {
+            <tr>
+                <td>@d.Name</td>
+                <td>@d.Serial</td>
+            </tr>
+        }
+    </table>
+
+    <br />
+    <table>
+        <tr>
+            <td>Podpis administratora<br/>@Model.data.AdmFName @Model.data.AdmLName</td>
+            <td>Podpis wnioskującego<br/>@Model.data.WhoFName @Model.data.WhoLName</td>
+            <td>Podpis inspektora<br/>@Model.data.IodFName @Model.data.IodLName</td>
+        </tr>
+    </table>
+
+    <footer>
+        <p>Wygenerowano dnia: @Model.data.DateNow.ToString("dd.MM.yyyy") poprzez aplikację SimplyManage</p>
+    </footer>
+</body>
+</html>*@

@@ -1,0 +1,76 @@
+﻿@model webapp.Pages.AdminModel
+
+<h2>Dodaj użytkownika</h2>
+
+<form method="post" asp-page-handler="AddUser">
+    <div class="mb-3">
+        <label for="username" class="form-label">Nazwa użytkownika</label>
+        <input type="text" class="form-control" id="username" name="username" required />
+    </div>
+    <div class="mb-3">
+        <label for="firstName" class="form-label">Imię</label>
+        <input type="text" class="form-control" id="firstName" name="firstName" />
+    </div>
+    <div class="mb-3">
+        <label for="lastName" class="form-label">Nazwisko</label>
+        <input type="text" class="form-control" id="lastName" name="lastName" />
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email" />
+    </div>
+    <div class="mb-3">
+        <label for="departmentId" class="form-label">Wydział</label>
+        <select class="form-select" id="departmentId" name="departmentId" onchange="filterDegrees()" required>
+            <option value="">Wybierz wydział</option>
+            @foreach (var department in Model.Departments)
+            {
+                <option value="@department.Id">@department.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="degreeId" class="form-label">Stopień</label>
+        <select class="form-select" id="degreeId" name="degreeId" required>
+            <option value="">Wybierz stopień</option>
+            @foreach (var degree in Model.Degrees)
+            {
+                <option value="@degree.Id" data-department-id="@degree.DepartmentId">@degree.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Hasło</label>
+        <input type="password" class="form-control" id="password" name="password" required />
+    </div>
+    <div class="mb-3">
+        <label for="isAdmin" class="form-label">Typ użytkownika</label>
+        <select class="form-select" id="isAdmin" name="isAdmin" required>
+            <option value="0">Zwykły użytkownik</option>
+            <option value="1">Administrator</option>
+            <option value="2">Inspektor ochrony danych</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Dodaj</button>
+</form>
+
+<script>
+    function filterDegrees() {
+        var departmentId = document.getElementById("departmentId").value;
+        var degreeSelect = document.getElementById("degreeId");
+        var options = degreeSelect.options;
+
+        for (var i = 0; i < options.length; i++) {
+            var option = options[i];
+            var optionDepartmentId = option.getAttribute("data-department-id");
+
+            if (!departmentId || optionDepartmentId === departmentId) {
+                option.style.display = "block";
+            } else {
+                option.style.display = "none";
+            }
+        }
+
+        degreeSelect.value = ""; // Reset the selected value
+    }
+</script>

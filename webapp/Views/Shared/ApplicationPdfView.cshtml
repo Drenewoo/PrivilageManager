@@ -1,0 +1,122 @@
+@model webapp.Pages.ApplicationData
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 11pt; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+        th, td { border: 1px solid #000; padding: 6px; vertical-align: top; }
+        .header { background: #dcdcdc; font-weight: bold; font-size: 9pt; border: 1px solid #000; padding: 4px; }
+        .section { margin-bottom: 10px; }
+        footer { margin-top: 20px; font-size: 9pt; }
+        .signature td { border: none; text-align: center; }
+        .signature strong { display: block; margin-top: 5px; }
+        .empty-row td { height: 25px; } /* puste wiersze jak w formularzu */
+    </style>
+</head>
+<body>
+    <!-- numer wniosku i data -->
+    <table>
+        <tr>
+            <td>Numer wniosku<br/><strong>@Model.ApplicationId</strong></td>
+            <td>Data złożenia wniosku<br/><strong>@Model.ApplicationDate.ToString("dd.MM.yyyy")</strong></td>
+        </tr>
+    </table>
+
+    <!-- wnioskodawca -->
+    <div class="header">Wnioskodawca:</div>
+    <table>
+        <tr>
+            <td>Imię i Nazwisko<br/><strong>@Model.WhoFName @Model.WhoLName</strong></td>
+            <td>Stanowisko<br/><strong>@Model.Degree</strong></td>
+            <td>Wydział<br/><strong>@Model.Department</strong></td>
+        </tr>
+    </table>
+
+    <!-- wnioskuje dla -->
+    <div class="header">Wnioskuje dla:</div>
+    <table>
+        <tr>
+            <td>Imię i Nazwisko<br/><strong>@Model.ForFName @Model.ForLName</strong></td>
+            <td>Stanowisko<br/><strong>@Model.DegreeFor</strong></td>
+            <td>Wydział<br/><strong>@Model.DepartmentFor</strong></td>
+        </tr>
+    </table>
+
+    <!-- wiadomość -->
+    <div class="header">Wiadomość dodatkowa do wniosku:</div>
+    <table>
+        <tr><td>@Model.MessageText</td></tr>
+    </table>
+
+    <!-- data wygaśnięcia -->
+    <div class="header">Data wygaśnięcia wniosku:</div>
+    <table>
+        <tr><td>@Model.ExpireDate</td></tr>
+    </table>
+
+    <!-- uprawnienia -->
+    <div class="header">Uprawnienia do programów / zasobów:</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Program</th>
+                <th>Uprawnienie</th>
+                <th>Nazwa użytkownika</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Permissions)
+            {
+                <tr>
+                    <td>@p.Program</td>
+                    <td>@p.Permission</td>
+                    <td>@p.Login</td>
+                </tr>
+            }
+            <!-- dopisujemy parę pustych wierszy dla stałej wysokości -->
+            <tr class="empty-row"><td></td><td></td><td></td></tr>
+        </tbody>
+    </table>
+
+    <!-- urządzenia -->
+    <div class="header">Urządzenia:</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Nazwa urządzenia</th>
+                <th>Numer seryjny</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model.Devices)
+            {
+                <tr>
+                    <td>@d.Name</td>
+                    <td>@d.Serial</td>
+                </tr>
+            }
+            <tr class="empty-row"><td></td><td></td></tr>
+        </tbody>
+    </table>
+
+    <!-- podpisy -->
+    <br />
+    <table class="signature w-100">
+        <tr>
+            <td>Podpis administratora<strong>@Model.AdmFName @Model.AdmLName</strong></td>
+            <td>Podpis wnioskującego<strong>@Model.WhoFName @Model.WhoLName</strong></td>
+            <td>Podpis inspektora ochrony danych<strong>@Model.IodFName @Model.IodLName</strong></td>
+        </tr>
+    </table>
+
+    <footer>
+        Wygenerowano dnia: @Model.DateNow.ToString("dd.MM.yyyy") poprzez aplikację SimplyManage
+    </footer>
+</body>
+</html>
